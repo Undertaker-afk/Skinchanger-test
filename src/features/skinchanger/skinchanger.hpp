@@ -113,6 +113,8 @@ private:
     static GloveInfo s_added_gloves;
 
     static uintptr_t s_client_base;
+    
+public:
     static uintptr_t s_fn_create_econ_item;
     static uintptr_t s_fn_set_dynamic_attr;
     static uintptr_t s_fn_get_econ_item_system;
