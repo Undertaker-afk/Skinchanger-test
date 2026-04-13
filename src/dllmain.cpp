@@ -31,6 +31,7 @@ static ID3D11RenderTargetView* g_render_target_view = nullptr;
 static WNDPROC g_original_wnd_proc = nullptr;
 static bool g_initialized = false;
 static bool g_show_menu = true;
+static HMODULE g_h_module = nullptr;
 
 // ============================================================================
 // HOOKS
@@ -76,7 +77,8 @@ static HRESULT __stdcall HookedPresent(IDXGISwapChain* swap_chain, UINT sync_int
             ImGui_ImplWin32_Init(g_hwnd);
             ImGui_ImplDX11_Init(g_device, g_context);
 
-            // Subclass window
+            // Subclass window - declare WndProc first
+            extern LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
             g_original_wnd_proc = reinterpret_cast<WNDPROC>(
                 SetWindowLongPtr(g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc)));
 
@@ -327,8 +329,6 @@ DWORD WINAPI MainThread(LPVOID) {
     FreeLibraryAndExitThread(static_cast<HMODULE>(g_h_module), 0);
     return 0;
 }
-
-static HMODULE g_h_module = nullptr;
 
 BOOL APIENTRY DllMain(HMODULE h_module, DWORD reason, LPVOID reserved) {
     if (reason == DLL_PROCESS_ATTACH) {

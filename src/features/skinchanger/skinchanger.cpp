@@ -137,8 +137,8 @@ void SkinChanger::Shutdown() {
 static uintptr_t GetInventoryManager() {
     if (!SkinChanger::s_fn_inventory_manager) return 0;
     using Fn = uintptr_t(__fastcall*)();
-    __try { return ((Fn)SkinChanger::s_fn_inventory_manager)(); }
-    __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+    try { return ((Fn)SkinChanger::s_fn_inventory_manager)(); }
+    catch (...) { return 0; }
 }
 
 static uintptr_t GetLocalInventory(uintptr_t manager) {
@@ -167,15 +167,15 @@ static uint64_t GetInventoryOwner(uintptr_t inventory) {
 static CEconItem_t* CreateEconItem() {
     if (!SkinChanger::s_fn_create_econ_item) return nullptr;
     using Fn = CEconItem_t*(__cdecl*)();
-    __try { return ((Fn)SkinChanger::s_fn_create_econ_item)(); }
-    __except (EXCEPTION_EXECUTE_HANDLER) { return nullptr; }
+    try { return ((Fn)SkinChanger::s_fn_create_econ_item)(); }
+    catch (...) { return nullptr; }
 }
 
 static void SetDynamicAttributeValue(CEconItem_t* item, uint16_t attr_index, float value) {
     if (!SkinChanger::s_fn_set_dynamic_attr || !item) return;
     using Fn = void(__fastcall*)(CEconItem_t*, uint16_t, float);
-    __try { ((Fn)SkinChanger::s_fn_set_dynamic_attr)(item, attr_index, value); }
-    __except (EXCEPTION_EXECUTE_HANDLER) {}
+    try { ((Fn)SkinChanger::s_fn_set_dynamic_attr)(item, attr_index, value); }
+    catch (...) {}
 }
 
 bool SkinChanger::CreateAndEquipItem(uintptr_t inventory, uintptr_t manager,
@@ -359,8 +359,8 @@ void SkinChanger::ApplyGloves(uintptr_t inventory, uintptr_t pawn, uintptr_t vie
         // SetMeshGroupMask on viewmodel
         if (s_fn_set_mesh_group_mask) {
             using Fn = void(__fastcall*)(uintptr_t, uint32_t);
-            __try { ((Fn)s_fn_set_mesh_group_mask)(view_model, 1); }
-            __except (EXCEPTION_EXECUTE_HANDLER) {}
+            try { ((Fn)s_fn_set_mesh_group_mask)(view_model, 1); }
+            catch (...) {}
         }
     }
 }
@@ -487,24 +487,24 @@ void SkinChanger::OnFrameStageNotify(int stage) {
                 const DumpedItemDef* def = ItemDatabase::FindByDefIndex(target_def);
                 if (def && !def->model_path.empty()) {
                     using SetModelFn = void(__fastcall*)(uintptr_t, const char*);
-                    __try {
+                    try {
                         ((SetModelFn)s_fn_set_model)(entity, def->model_path.c_str());
                         if (view_model)
                             ((SetModelFn)s_fn_set_model)(view_model, def->model_path.c_str());
                     }
-                    __except (EXCEPTION_EXECUTE_HANDLER) {}
+                    catch (...) {}
                 }
             }
 
             // MeshGroupMask
             if (s_fn_set_mesh_group_mask) {
                 using Fn = void(__fastcall*)(uintptr_t, uint32_t);
-                __try {
+                try {
                     ((Fn)s_fn_set_mesh_group_mask)(entity, 2);
                     if (view_model)
                         ((Fn)s_fn_set_mesh_group_mask)(view_model, 2);
                 }
-                __except (EXCEPTION_EXECUTE_HANDLER) {}
+                catch (...) {}
             }
             continue;
         }
@@ -529,7 +529,7 @@ void SkinChanger::OnFrameStageNotify(int stage) {
         if (!skin.custom_name.empty()) {
             char* name_ptr = reinterpret_cast<char*>(item_view + offsets::C_EconItemView::m_szCustomName);
             std::memset(name_ptr, 0, 161);
-            std::strncpy(name_ptr, skin.custom_name.c_str(), 160);
+            std::strncpy_s(name_ptr, 161, skin.custom_name.c_str(), 160);
         }
 
         // MeshGroupMask — 2 for legacy, 1 for CS2-native
@@ -539,7 +539,7 @@ void SkinChanger::OnFrameStageNotify(int stage) {
             if (const DumpedPaintKit* pk = ItemDatabase::FindPaintKit(skin.paint_kit_id))
                 legacy = pk->is_legacy;
             uint32_t mask = legacy ? 2 : 1;
-            __try {
+            try {
                 ((Fn)s_fn_set_mesh_group_mask)(entity, mask);
                 if (view_model) {
                     uint32_t vm_weapon = *reinterpret_cast<uint32_t*>(view_model + 0x38);
@@ -547,7 +547,7 @@ void SkinChanger::OnFrameStageNotify(int stage) {
                         ((Fn)s_fn_set_mesh_group_mask)(view_model, mask);
                 }
             }
-            __except (EXCEPTION_EXECUTE_HANDLER) {}
+            catch (...) {}
         }
     }
 }
@@ -557,7 +557,7 @@ void SkinChanger::OnSetModel(void* entity, const char*& model_path) {
     if (!s_knife.enabled) return;
 
     // Redirect viewmodel model to custom knife model
-    const DumpedItemDef* def = ItemDatabase::FindByDefIndex(s_knife.defIndex);
+    const DumpedItemDef* def = ItemDatabase::FindByDefIndex(s_knife.def_index);
     if (def && !def->model_path.empty()) {
         model_path = def->model_path.c_str();
     }

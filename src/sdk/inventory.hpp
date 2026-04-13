@@ -1,15 +1,17 @@
 #pragma once
 
-#include <Windows.h>
+#include <windows.h>
 #include <cstdint>
 #include <cstddef>
+#include <type_traits>
+#include <utility>
 
 namespace cs2 {
 
-template<typename T>
-inline T CallVFunc(void* thisptr, size_t index, auto&&... args) {
-    using Fn = T(__thiscall*)(void*, decltype(args)...);
-    return (*reinterpret_cast<Fn**>(thisptr))[index](thisptr, args...);
+template<typename T, typename... Args>
+inline T CallVFunc(void* thisptr, size_t index, Args&&... args) {
+    using Fn = T(__thiscall*)(void*, std::remove_reference_t<Args>...);
+    return (*reinterpret_cast<Fn**>(thisptr))[index](thisptr, std::forward<Args>(args)...);
 }
 
 struct SOID_t {

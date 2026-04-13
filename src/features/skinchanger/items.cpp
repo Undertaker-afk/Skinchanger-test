@@ -139,12 +139,12 @@ std::vector<DumpedItemDef> ItemDatabase::Search(std::string_view query) {
 
     std::string lower_query;
     lower_query.reserve(query.size());
-    for (char c : query) lower_query += std::tolower(static_cast<unsigned char>(c));
+    for (char c : query) lower_query += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 
     for (const auto& item : s_items) {
         std::string lower_name = item.name;
         std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(),
-            [](unsigned char c) { return std::tolower(c); });
+            [](unsigned char c) -> char { return static_cast<char>(std::tolower(c)); });
         if (lower_name.find(lower_query) != std::string::npos)
             results.push_back(item);
     }
@@ -162,7 +162,7 @@ std::vector<DumpedItemDef> ItemDatabase::Search(std::string_view query, ItemType
 
     std::string lower_query;
     lower_query.reserve(query.size());
-    for (char c : query) lower_query += std::tolower(static_cast<unsigned char>(c));
+    for (char c : query) lower_query += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 
     for (const auto& item : s_items) {
         if (item.type != type) continue;
