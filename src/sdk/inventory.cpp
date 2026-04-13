@@ -34,7 +34,7 @@ CCSPlayerInventory* CCSPlayerInventory::GetInstance() {
     return g_player_inventory;
 }
 
-bool CCSPlayerInventory::AddEconItem(CEconItem* pItem) {
+bool CCSPlayerInventory::AddEconItem(CEconItem_t* pItem) {
     if (!pItem) return false;
 
     // TODO: RE REQUIRED - Full implementation needs the CEconItem creation pattern
@@ -44,7 +44,7 @@ bool CCSPlayerInventory::AddEconItem(CEconItem* pItem) {
     return false;
 }
 
-void CCSPlayerInventory::RemoveEconItem(CEconItem* pItem) {
+void CCSPlayerInventory::RemoveEconItem(CEconItem_t* pItem) {
     if (!pItem) return;
 
     // TODO: RE REQUIRED - Item removal via SODestroyed or inventory removal function
@@ -76,7 +76,7 @@ C_EconItemView* CCSPlayerInventory::GetItemViewForItem(uint64_t itemID) {
     return nullptr;
 }
 
-CEconItem* CCSPlayerInventory::GetSOCDataForItem(uint64_t itemID) {
+CEconItem_t* CCSPlayerInventory::GetSOCDataForItem(uint64_t itemID) {
     // TODO: RE REQUIRED - SOC data lookup
     // The SOC (Shared Object Cache) stores the actual item data
     // This requires traversing the cache or using the type cache

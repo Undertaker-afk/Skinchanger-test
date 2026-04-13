@@ -83,10 +83,10 @@ public:
         CallVFunc<void, 2>(this, owner, pObject, eEvent);
     }
 
-    bool AddEconItem(CEconItem* pItem);
-    void RemoveEconItem(CEconItem* pItem);
+    bool AddEconItem(CEconItem_t* pItem);
+    void RemoveEconItem(CEconItem_t* pItem);
     C_EconItemView* GetItemViewForItem(uint64_t itemID);
-    CEconItem* GetSOCDataForItem(uint64_t itemID);
+    CEconItem_t* GetSOCDataForItem(uint64_t itemID);
 };
 
 class CCSInventoryManager {

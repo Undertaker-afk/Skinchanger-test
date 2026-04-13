@@ -71,7 +71,9 @@ static HRESULT __stdcall HookedPresent(IDXGISwapChain* swap_chain, UINT sync_int
             ImGui::CreateContext();
             ImGuiIO& io = ImGui::GetIO();
             io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+#ifdef IMGUI_HAS_DOCK
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+#endif
             ImGui::StyleColorsDark();
 
             ImGui_ImplWin32_Init(g_hwnd);
@@ -83,7 +85,7 @@ static HRESULT __stdcall HookedPresent(IDXGISwapChain* swap_chain, UINT sync_int
 
             // Subclass window
             g_original_wnd_proc = reinterpret_cast<WNDPROC>(
-                SetWindowLongPtr(g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc)));
+                SetWindowLongPtr(g_hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WndProc)));
 
             g_initialized = true;
         }
@@ -134,8 +136,7 @@ static HRESULT __stdcall HookedResizeBuffers(IDXGISwapChain* swap_chain, UINT bu
 
 static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     if (g_show_menu) {
-        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-            return true;
+        ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);
     }
 
     // Toggle menu with Insert key
@@ -331,7 +332,7 @@ DWORD WINAPI MainThread(LPVOID) {
 
 static HMODULE g_h_module = nullptr;
 
-BOOL APIENTRY DllMain(HMODULE h_module, DWORD reason, LPVOID reserved) {
+extern "C" __declspec(dllexport) BOOL APIENTRY DllMain(HMODULE h_module, DWORD reason, LPVOID reserved) {
     if (reason == DLL_PROCESS_ATTACH) {
         g_h_module = h_module;
         DisableThreadLibraryCalls(h_module);

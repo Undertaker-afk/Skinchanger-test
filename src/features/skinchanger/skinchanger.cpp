@@ -137,8 +137,7 @@ void SkinChanger::Shutdown() {
 static uintptr_t GetInventoryManager() {
     if (!SkinChanger::s_fn_inventory_manager) return 0;
     using Fn = uintptr_t(__fastcall*)();
-    __try { return ((Fn)SkinChanger::s_fn_inventory_manager)(); }
-    __except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
+    return reinterpret_cast<Fn>(SkinChanger::s_fn_inventory_manager)();
 }
 
 static uintptr_t GetLocalInventory(uintptr_t manager) {
@@ -167,15 +166,13 @@ static uint64_t GetInventoryOwner(uintptr_t inventory) {
 static CEconItem_t* CreateEconItem() {
     if (!SkinChanger::s_fn_create_econ_item) return nullptr;
     using Fn = CEconItem_t*(__cdecl*)();
-    __try { return ((Fn)SkinChanger::s_fn_create_econ_item)(); }
-    __except (EXCEPTION_EXECUTE_HANDLER) { return nullptr; }
+    return reinterpret_cast<Fn>(SkinChanger::s_fn_create_econ_item)();
 }
 
 static void SetDynamicAttributeValue(CEconItem_t* item, uint16_t attr_index, float value) {
     if (!SkinChanger::s_fn_set_dynamic_attr || !item) return;
     using Fn = void(__fastcall*)(CEconItem_t*, uint16_t, float);
-    __try { ((Fn)SkinChanger::s_fn_set_dynamic_attr)(item, attr_index, value); }
-    __except (EXCEPTION_EXECUTE_HANDLER) {}
+    reinterpret_cast<Fn>(SkinChanger::s_fn_set_dynamic_attr)(item, attr_index, value);
 }
 
 bool SkinChanger::CreateAndEquipItem(uintptr_t inventory, uintptr_t manager,
@@ -419,8 +416,8 @@ void SkinChanger::OnFrameStageNotify(int stage) {
     uintptr_t pawn = *reinterpret_cast<uintptr_t*>(pawn_list + slot * 0x78 + 0x10 + offset * 0x78);
     if (!pawn) return;
 
-    // Check alive
-    int32_t health = *reinterpret_cast<int32_t*>(pawn + 0x344);
+    // Check alive - moved outside __try block
+    int32_t health = *reinterpret_cast<int32_t*>(pawn + offsets::C_BaseEntity::m_iHealth);
     if (health <= 0) return;
 
     // Get viewmodel
@@ -465,7 +462,7 @@ void SkinChanger::OnFrameStageNotify(int stage) {
         if (ItemDatabase::IsKnife(def_index)) {
             if (!s_knife.enabled) continue;
 
-            int target_def = s_knife.defIndex;
+            int target_def = s_knife.def_index;
 
             // Update EconItemView def index
             *reinterpret_cast<uint16_t*>(item_view + offsets::C_EconItemView::m_iItemDefinitionIndex) =
@@ -557,7 +554,7 @@ void SkinChanger::OnSetModel(void* entity, const char*& model_path) {
     if (!s_knife.enabled) return;
 
     // Redirect viewmodel model to custom knife model
-    const DumpedItemDef* def = ItemDatabase::FindByDefIndex(s_knife.defIndex);
+    const DumpedItemDef* def = ItemDatabase::FindByDefIndex(s_knife.def_index);
     if (def && !def->model_path.empty()) {
         model_path = def->model_path.c_str();
     }
