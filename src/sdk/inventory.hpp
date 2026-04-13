@@ -68,25 +68,25 @@ public:
     SOID_t& GetOwner() { return *reinterpret_cast<SOID_t*>(reinterpret_cast<uintptr_t>(this) + 0x10); }
 
     C_EconItemView* GetItemInLoadout(int iClass, int iSlot) {
-        return CallVFunc<C_EconItemView*, 8>(this, iClass, iSlot);
+        return CallVFunc<C_EconItemView*>(this, 8, iClass, iSlot);
     }
 
     void SOCreated(SOID_t owner, CSharedObject* pObject, ESOCacheEvent eEvent) {
-        CallVFunc<void, 0>(this, owner, pObject, eEvent);
+        CallVFunc<void>(this, 0, owner, pObject, eEvent);
     }
 
     void SOUpdated(SOID_t owner, CSharedObject* pObject, ESOCacheEvent eEvent) {
-        CallVFunc<void, 1>(this, owner, pObject, eEvent);
+        CallVFunc<void>(this, 1, owner, pObject, eEvent);
     }
 
     void SODestroyed(SOID_t owner, CSharedObject* pObject, ESOCacheEvent eEvent) {
-        CallVFunc<void, 2>(this, owner, pObject, eEvent);
+        CallVFunc<void>(this, 2, owner, pObject, eEvent);
     }
 
-    bool AddEconItem(CEconItem* pItem);
-    void RemoveEconItem(CEconItem* pItem);
+    bool AddEconItem(CEconItem_t* pItem);
+    void RemoveEconItem(CEconItem_t* pItem);
     C_EconItemView* GetItemViewForItem(uint64_t itemID);
-    CEconItem* GetSOCDataForItem(uint64_t itemID);
+    CEconItem_t* GetSOCDataForItem(uint64_t itemID);
 };
 
 class CCSInventoryManager {
@@ -94,11 +94,11 @@ public:
     static CCSInventoryManager* GetInstance();
 
     void EquipItemInLoadout(int iTeam, int iSlot, uint64_t iItemID) {
-        CallVFunc<void, 54>(this, iTeam, iSlot, iItemID);
+        CallVFunc<void>(this, 54, iTeam, iSlot, iItemID);
     }
 
     CCSPlayerInventory* GetLocalInventory() {
-        return CallVFunc<CCSPlayerInventory*, 57>(this);
+        return CallVFunc<CCSPlayerInventory*>(this, 57);
     }
 };
 
