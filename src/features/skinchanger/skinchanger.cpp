@@ -145,14 +145,14 @@ static uintptr_t GetLocalInventory(uintptr_t manager) {
     if (!manager) return 0;
     // vtable index 68 (wh-esports) — was 57 in older versions
     using Fn = uintptr_t(__fastcall*)(void*);
-    return reinterpret_cast<Fn>((*reinterpret_cast<void***>(manager))[68])(manager);
+    return reinterpret_cast<Fn>((*reinterpret_cast<void***>(manager))[68])(reinterpret_cast<void*>(manager));
 }
 
 static bool EquipItemInLoadout(uintptr_t manager, int team, int slot, uint64_t item_id) {
     if (!manager) return false;
     // vtable index 65 (wh-esports) — was 54 in older versions
     using Fn = bool(__fastcall*)(void*, int, int, uint64_t);
-    return reinterpret_cast<Fn>((*reinterpret_cast<void***>(manager))[65])(manager, team, slot, item_id);
+    return reinterpret_cast<Fn>((*reinterpret_cast<void***>(manager))[65])(reinterpret_cast<void*>(manager), team, slot, item_id);
 }
 
 static uint64_t GetInventoryOwner(uintptr_t inventory) {
@@ -207,7 +207,7 @@ bool SkinChanger::CreateAndEquipItem(uintptr_t inventory, uintptr_t manager,
     // Add to SO cache via SOCreated (vtable 0)
     using SOCreatedFn = void(__fastcall*)(void*, SOID_t, CEconItem_t*, int);
     SOID_t owner = *reinterpret_cast<SOID_t*>(inventory + 0x10);
-    reinterpret_cast<SOCreatedFn>((*reinterpret_cast<void***>(inventory))[0])(inventory, owner, item, 0);
+    reinterpret_cast<SOCreatedFn>((*reinterpret_cast<void***>(inventory))[0])(reinterpret_cast<void*>(inventory), owner, item, 0);
 
     bool equipped = EquipItemInLoadout(manager, team, slot, fake_id);
     if (equipped) {
@@ -529,7 +529,7 @@ void SkinChanger::OnFrameStageNotify(int stage) {
         if (!skin.custom_name.empty()) {
             char* name_ptr = reinterpret_cast<char*>(item_view + offsets::C_EconItemView::m_szCustomName);
             std::memset(name_ptr, 0, 161);
-            std::strncpy_s(name_ptr, 161, skin.custom_name.c_str(), 160);
+            strncpy_s(name_ptr, 161, skin.custom_name.c_str(), 160);
         }
 
         // MeshGroupMask — 2 for legacy, 1 for CS2-native

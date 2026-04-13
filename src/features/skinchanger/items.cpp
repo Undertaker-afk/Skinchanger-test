@@ -168,7 +168,7 @@ std::vector<DumpedItemDef> ItemDatabase::Search(std::string_view query, ItemType
         if (item.type != type) continue;
         std::string lower_name = item.name;
         std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(),
-            [](unsigned char c) { return std::tolower(c); });
+            [](unsigned char c) -> char { return static_cast<char>(std::tolower(c)); });
         if (lower_name.find(lower_query) != std::string::npos)
             results.push_back(item);
     }

@@ -8,10 +8,10 @@
 
 namespace cs2 {
 
-template<typename T, typename... Args>
-inline T CallVFunc(void* thisptr, size_t index, Args&&... args) {
+template<typename T, size_t Index, typename... Args>
+inline T CallVFunc(void* thisptr, Args&&... args) {
     using Fn = T(__thiscall*)(void*, std::remove_reference_t<Args>...);
-    return (*reinterpret_cast<Fn**>(thisptr))[index](thisptr, std::forward<Args>(args)...);
+    return (*reinterpret_cast<Fn**>(thisptr))[Index](thisptr, std::forward<Args>(args)...);
 }
 
 struct SOID_t {
