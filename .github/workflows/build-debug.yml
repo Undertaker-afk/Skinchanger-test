@@ -14,7 +14,7 @@ on:
 jobs:
   build-debug:
     name: Build Debug (x64) — Console + Full Logging
-    runs-on: blacksmith-4vcpu-windows-2025
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
